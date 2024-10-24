@@ -19,7 +19,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['pwd'])) {
             $_SESSION['loggedin'] = true;
+            $_SESSION['id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['nombre_real'] = $user['nombre_real'];
+            $_SESSION['email'] = $user['email'];
             header("Location: ../index.php");
             exit();
         }
@@ -29,7 +32,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['section'] = 'signin';
     header("Location: ../views/form.php?section=signin");
     exit();
-
-    mysqli_stmt_close($stmt);
 }
+
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
 ?>

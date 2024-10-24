@@ -15,7 +15,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     <title>ChatOnline</title>
 </head>
 <body>
-    <p>Bienvenido, <?php echo ($_SESSION['username']); ?>!</p>
+    <p>Bienvenido, <?php echo ($_SESSION['nombre_real']); ?>!</p>
 
     <form action="./db/logout.php" method="post">
         <button type="submit">Cerrar sesión</button>

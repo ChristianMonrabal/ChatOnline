@@ -7,17 +7,16 @@ include '../php/validation_form.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_SESSION['signup_username'];
     $email = $_SESSION['signup_email'];
+    $nombre_real = $_SESSION['nombre_real'];
     $hashed_password = password_hash($_POST['signup_password'], PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO usuarios (username, email, pwd) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO usuarios (username, nombre_real, email, pwd) VALUES (?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashed_password);
+    mysqli_stmt_bind_param($stmt, "ssss", $username, $nombre_real, $email, $hashed_password);
 
     if (mysqli_stmt_execute($stmt)) {
         $_SESSION['loggedin'] = true;
         $_SESSION['username'] = $username;
-        unset($_SESSION['signup_username']);
-        unset($_SESSION['signup_email']);
         header("Location: ../index.php");
         exit();
     } else {

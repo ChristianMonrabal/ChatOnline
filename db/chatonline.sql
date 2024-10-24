@@ -5,9 +5,9 @@ USE chat_online;
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+	nombre_real VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    pwd VARCHAR(255) NOT NULL,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    pwd VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE solicitudes_amistad (

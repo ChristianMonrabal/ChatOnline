@@ -15,6 +15,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['signup_username'] = $username;
             }
 
+            if (empty(trim($_POST['nombre_real']))) {
+                $_SESSION['error'] = "El nombre real es obligatorio.";
+                header("Location: ../views/form.php?section=signup");
+                exit();
+            } else {
+                $nombre_real = htmlspecialchars(trim($_POST['nombre_real']));
+                $_SESSION['nombre_real'] = $nombre_real;
+            }
+
             if (empty(trim($_POST['signup_email']))) {
                 $_SESSION['error'] = "El correo electrónico es obligatorio.";
                 header("Location: ../views/form.php?section=signup");
@@ -102,5 +111,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             break;
     }
 }
-
 ?>
