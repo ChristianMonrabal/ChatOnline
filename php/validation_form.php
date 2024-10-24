@@ -28,12 +28,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['signup_email'] = $email;
             }
 
+            if (empty(trim($_POST['nombre_real']))) {
+                $_SESSION['error'] = "El nombre real es obligatorio.";
+                header("Location: ../views/form.php?section=signup");
+                exit();
+            } else {
+                $nombre_real = htmlspecialchars(trim($_POST['nombre_real']));
+                $_SESSION['nombre_real'] = $nombre_real;
+            }
+
             if (empty(trim($_POST['signup_password']))) {
                 $_SESSION['error'] = "La contraseña es obligatoria.";
                 header("Location: ../views/form.php?section=signup");
                 exit();
             } elseif (strlen(trim($_POST['signup_password'])) < 6) {
                 $_SESSION['error'] = "La contraseña debe tener al menos 6 caracteres.";
+                header("Location: ../views/form.php?section=signup");
+                exit();
+            } elseif (!preg_match('/[A-Z]/', $_POST['signup_password'])) {
+                $_SESSION['error'] = "La contraseña debe contener al menos una letra mayúscula.";
+                header("Location: ../views/form.php?section=signup");
+                exit();
+            } elseif (!preg_match('/[0-9]/', $_POST['signup_password'])) {
+                $_SESSION['error'] = "La contraseña debe contener al menos un número.";
                 header("Location: ../views/form.php?section=signup");
                 exit();
             }
@@ -48,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             }
 
-            include 'conexion.php';
+            include '../db/conexion.php';
 
             $sql_username_check = "SELECT id FROM usuarios WHERE username = ?";
             $stmt_username = mysqli_prepare($conn, $sql_username_check);
