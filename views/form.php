@@ -5,6 +5,9 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     header("Location: ../index.php");
     exit();
 }
+
+// Verificar si se especifica una sección en la URL
+$section = isset($_GET['section']) ? $_GET['section'] : 'signin';
 ?>
 
 <!DOCTYPE html>

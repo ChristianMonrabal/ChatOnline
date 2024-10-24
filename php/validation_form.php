@@ -36,6 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['error'] = "La contraseña debe tener al menos 6 caracteres.";
                 header("Location: ../views/form.php?section=signup");
                 exit();
+            } elseif (!preg_match('/[A-Z]/', $_POST['signup_password'])) {
+                $_SESSION['error'] = "La contraseña debe contener al menos una letra mayúscula.";
+                header("Location: ../views/form.php?section=signup");
+                exit();
+            } elseif (!preg_match('/[0-9]/', $_POST['signup_password'])) {
+                $_SESSION['error'] = "La contraseña debe contener al menos un número.";
+                header("Location: ../views/form.php?section=signup");
+                exit();
             }
 
             if (empty(trim($_POST['signup_confirm_password']))) {
@@ -94,4 +102,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             break;
     }
 }
+
 ?>
