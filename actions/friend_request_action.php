@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $usuario_id = $_SESSION['usuario_id'];
         $amigo_id = $_POST['amigo_id'];
 
-        // Verificar si ya existe una solicitud de amistad
         $check_query = "SELECT * FROM Amistades WHERE usuario_id = '$usuario_id' AND amigo_id = '$amigo_id' AND estado = 'pendiente'";
         $check_result = mysqli_query($conn, $check_query);
 

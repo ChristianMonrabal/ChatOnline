@@ -31,7 +31,7 @@ $usuario = mysqli_fetch_assoc($result_usuario);
         </div>
         <h2>Buscar Usuarios</h2>
         <form id="search-form">
-            <input type="text" name="search" placeholder="Buscar usuarios" required class="form-control">
+            <input type="text" name="search" placeholder="Buscar usuarios" class="form-control">
             <button type="submit" class="btn btn-success mt-2">Buscar</button>
         </form>
         <div id="search-results"></div>

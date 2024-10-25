@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Redirigir a la página principal si ya está logueado
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
     header("Location: ../index.php");
     exit();
 }
 
-// Determinar la sección activa (signin o signup)
 $section = isset($_GET['section']) ? $_GET['section'] : 'signin';
 ?>
 

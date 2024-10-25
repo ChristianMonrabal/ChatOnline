@@ -4,7 +4,6 @@ session_start();
 include '../config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Cambia 'username' por 'email' para recoger el correo electrónico
     $signin_email = isset($_POST['email']) ? trim($_POST['email']) : '';
     if (empty($signin_email)) {
         $_SESSION['error'] = "El correo electrónico es obligatorio.";
