@@ -151,7 +151,7 @@ input {
 }
 
 .overlay {
-    background: #25D366; /* Color verde de WhatsApp */
+    background: #25D366;
     color: #FFFFFF;
     position: relative;
     left: -100%;
