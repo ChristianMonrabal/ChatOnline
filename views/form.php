@@ -25,7 +25,7 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'signin';
                 <h1>Crea tu cuenta</h1>
                 <br>
                 <input type="text" name="signup_username" placeholder="Introduce el nombre de tu usuario" value="<?php echo isset($_SESSION['signup_username']) ? htmlspecialchars($_SESSION['signup_username']) : ''; ?>" />
-                <input type="text" name="nombre_real" placeholder="Introduce tu nombre real" value="<?php echo isset($_SESSION['nombre_real']) ? htmlspecialchars($_SESSION['nombre_real']) : ''; ?>" />
+                <input type="text" name="nombre_real" placeholder="Introduce tu nombre completo" value="<?php echo isset($_SESSION['nombre_real']) ? htmlspecialchars($_SESSION['nombre_real']) : ''; ?>" />
                 <input type="email" name="signup_email" placeholder="Introduce tu correo electrónico" value="<?php echo isset($_SESSION['signup_email']) ? htmlspecialchars($_SESSION['signup_email']) : ''; ?>" />
                 <input type="password" name="signup_password" placeholder="Introduce tu contraseña" />
                 <input type="password" name="signup_confirm_password" placeholder="Introduce de nuevo tu contraseña" />
