@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['signup_username'] = $username;
 
     if (empty($nombre_real)) {
-        $_SESSION['error'] = "El nombre real es obligatorio.";
+        $_SESSION['error'] = "El nombre es obligatorio.";
         $_SESSION['section'] = 'signup';
         header("Location: ../public/login.php?section=signup");
         exit();

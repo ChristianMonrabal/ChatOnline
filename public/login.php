@@ -25,7 +25,7 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'signin';
             <h1>Crea tu cuenta</h1>
             <br>
             <input type="text" name="username" placeholder="Introduce el nombre de tu usuario" value="<?php echo isset($_SESSION['signup_username']) ? htmlspecialchars($_SESSION['signup_username']) : ''; ?>" />
-            <input type="text" name="nombre_real" placeholder="Introduce tu nombre completo" value="<?php echo isset($_SESSION['nombre_real']) ? htmlspecialchars($_SESSION['nombre_real']) : ''; ?>" />
+            <input type="text" name="nombre_real" placeholder="Introduce tu nombre y apellidos" value="<?php echo isset($_SESSION['nombre_real']) ? htmlspecialchars($_SESSION['nombre_real']) : ''; ?>" />
             <input type="email" name="email" placeholder="Introduce tu correo electrónico" value="<?php echo isset($_SESSION['signup_email']) ? htmlspecialchars($_SESSION['signup_email']) : ''; ?>" />
             <input type="password" name="password" placeholder="Introduce tu contraseña" />
             <input type="password" name="confirm_password" placeholder="Introduce de nuevo tu contraseña" />
@@ -44,7 +44,7 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'signin';
         </div>
         <div class="form-container sign-in-container" id="signInContainer">
             <form action="../actions/login_action.php" method="POST">
-                <h1>Iniciar sesión</h1>
+                <h1>Iniciar sesión en ChatPro</h1>
                 <br>
                 <input type="email" name="email" placeholder="Introduce tu correo electrónico" value="<?php echo isset($_SESSION['signin_email']) ? htmlspecialchars($_SESSION['signin_email']) : ''; ?>" />
                 <input type="password" name="password" placeholder="Introduce tu contraseña" />

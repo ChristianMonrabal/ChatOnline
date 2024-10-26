@@ -97,7 +97,7 @@ body {
     overflow-y: auto;
     flex: 1;
     padding: 10px;
-    background-color: #e5ddd5;
+    background: url(../img/background_chat.png);
 }
 
 #chat-form {
