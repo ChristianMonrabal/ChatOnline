@@ -64,7 +64,7 @@ $section = isset($_GET['section']) ? $_GET['section'] : 'signin';
         <div class="overlay-container">
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
-                    <h1>Bienvenid@ a ChatOnline</h1>
+                    <h1>Bienvenid@ a ChatPro</h1>
                     <p>Regístrate para empezar a usarlo o</p>
                     <button class="ghost" id="signIn" onclick="toggleForm('signin')">Inicia sesión</button>
                 </div>
