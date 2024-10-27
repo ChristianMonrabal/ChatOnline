@@ -3,7 +3,7 @@ include('../config/db.php');
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty(trim($_POST['search']))) {
+    if (!empty(trim($_POST['search'])) && strlen(trim($_POST['search'])) >= 4) {
         $search = mysqli_real_escape_string($conn, trim($_POST['search']));
         $query = "SELECT * FROM Usuarios WHERE username LIKE '%$search%' OR nombre_real LIKE '%$search%'";
         $result = mysqli_query($conn, $query);
@@ -20,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo "</div>";
             }
         } else {
-            echo "<p style= 'color: red;' >No se encontraron usuarios.</p>";
+            echo "<p style='color: red;'>No se encontraron usuarios.</p>";
         }
     } else {
-        echo "<p style= 'color: red;'>Introduce un usuario para buscar.</p>";
+        echo "<p style='color: red;'>Introduce al menos 4 caracteres para buscar.</p>";
     }
 }
 ?>

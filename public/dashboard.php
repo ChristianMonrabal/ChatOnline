@@ -36,6 +36,12 @@ $usuario = mysqli_fetch_assoc($result_usuario);
             <button type="submit" class="btn btn-success mt-2">Buscar</button>
         </form>
         <div id="search-results"></div>
+        <?php
+        if (isset($_SESSION['error_mensaje'])) {
+            echo "<span style='color: red;'>" . htmlspecialchars($_SESSION['error_mensaje']) . "</span>";
+            unset($_SESSION['error_mensaje']);
+        }
+        ?>
 
         <h2>Solicitudes de Amistad Pendientes</h2>
         <?php
