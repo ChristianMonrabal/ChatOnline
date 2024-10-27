@@ -14,6 +14,10 @@ $query = "SELECT * FROM Mensajes WHERE (emisor_id = '$usuario_id' AND receptor_i
         ORDER BY fecha_envio ASC";
 $result = mysqli_query($conn, $query);
 
+$update_query = "UPDATE Mensajes SET leido = 1 
+                WHERE emisor_id = '$amigo_id' AND receptor_id = '$usuario_id' AND leido = 0";
+mysqli_query($conn, $update_query);
+
 while ($mensaje = mysqli_fetch_assoc($result)) {
     $class = $mensaje['emisor_id'] == $usuario_id ? "user" : "friend";
     echo "<div class='message $class'>";

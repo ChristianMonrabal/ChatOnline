@@ -8,7 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mensaje = mysqli_real_escape_string($conn, trim($_POST['mensaje']));
 
     if (strlen($mensaje) <= 250) {
-        $query = "INSERT INTO Mensajes (emisor_id, receptor_id, mensaje, fecha_envio) VALUES ('$emisor_id', '$receptor_id', '$mensaje', NOW())";
+        $query = "INSERT INTO Mensajes (emisor_id, receptor_id, mensaje, fecha_envio, leido) 
+                    VALUES ('$emisor_id', '$receptor_id', '$mensaje', NOW(), 0)";
         if (mysqli_query($conn, $query)) {
             echo $emisor_id == $_SESSION['usuario_id'] ? "Tú: " : "Ellos: ";
             echo htmlspecialchars($mensaje) . "<br>";
@@ -17,11 +18,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
-
-echo "DAW2";
-
-
-
-
-
 ?>

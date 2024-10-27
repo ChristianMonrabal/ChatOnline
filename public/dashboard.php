@@ -59,17 +59,26 @@ $usuario = mysqli_fetch_assoc($result_usuario);
 
         <h2>Lista de Amigos</h2>
         <?php
-        $query = "SELECT u.id, u.username 
-                    FROM Amistades a 
-                    JOIN Usuarios u ON (a.usuario_id = u.id OR a.amigo_id = u.id) 
-                    WHERE (a.usuario_id = '$usuario_id' OR a.amigo_id = '$usuario_id') 
-                    AND a.estado = 'aceptada' 
-                    AND u.id != '$usuario_id'";
+        $query = "SELECT u.id, u.username, 
+                    (SELECT COUNT(*) FROM Mensajes 
+                    WHERE emisor_id = u.id 
+                    AND receptor_id = '$usuario_id' 
+                    AND leido = 0) AS mensajes_sin_leer
+                FROM Amistades a 
+                JOIN Usuarios u ON (a.usuario_id = u.id OR a.amigo_id = u.id) 
+                WHERE (a.usuario_id = '$usuario_id' OR a.amigo_id = '$usuario_id') 
+                AND a.estado = 'aceptada' 
+                AND u.id != '$usuario_id'";
         $result = mysqli_query($conn, $query);
 
         while ($amigo = mysqli_fetch_assoc($result)) {
             echo "<div class='friend p-2' data-id='" . $amigo['id'] . "'>";
             echo $amigo['username'];
+            echo " <span id='unread-" . $amigo['id'] . "' class='badge badge-primary'>";
+            if ($amigo['mensajes_sin_leer'] > 0) {
+                echo $amigo['mensajes_sin_leer'];
+            }
+            echo "</span>";
             echo "</div>";
         }
         ?>
@@ -91,5 +100,6 @@ $usuario = mysqli_fetch_assoc($result_usuario);
         </form>
     </div>
     <script src="../js/chat.js"></script>
+    <script src="../js/unread_message.js"></script>
 </body>
 </html>
