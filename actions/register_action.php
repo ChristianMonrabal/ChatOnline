@@ -1,5 +1,5 @@
 <?php
-session_start(); 
+session_start();
 
 include '../config/db.php';
 
@@ -8,9 +8,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre_real = isset($_POST['nombre_real']) ? htmlspecialchars(trim($_POST['nombre_real'])) : '';
     $email = isset($_POST['email']) ? htmlspecialchars(trim($_POST['email'])) : '';
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-    
+
     if (empty($username)) {
         $_SESSION['error'] = "El nombre de usuario es obligatorio.";
+        $_SESSION['section'] = 'signup';
+        header("Location: ../public/login.php?section=signup");
+        exit();
+    } elseif (strlen($username) < 3 || !preg_match('/^[A-Z]/', $username)) {
+        $_SESSION['error'] = "El nombre de usuario debe tener al menos 3 caracteres y comenzar con una letra mayúscula.";
         $_SESSION['section'] = 'signup';
         header("Location: ../public/login.php?section=signup");
         exit();

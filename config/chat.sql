@@ -29,7 +29,3 @@ CREATE TABLE Mensajes (
     FOREIGN KEY (emisor_id) REFERENCES Usuarios(id),
     FOREIGN KEY (receptor_id) REFERENCES Usuarios(id)
 );
-
-SELECT * FROM Usuarios;
-SELECT * FROM Amistades;
-SELECT * FROM Mensajes;

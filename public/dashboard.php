@@ -24,6 +24,8 @@ $usuario = mysqli_fetch_assoc($result_usuario);
     <link rel="shortcut icon" href="../img/icon.png" type="image/x-icon">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div id="sidebar">
@@ -78,13 +80,22 @@ $usuario = mysqli_fetch_assoc($result_usuario);
         $result = mysqli_query($conn, $query);
 
         while ($amigo = mysqli_fetch_assoc($result)) {
-            echo "<div class='friend p-2' data-id='" . $amigo['id'] . "'>";
+            echo "<div class='friend p-2 d-flex justify-content-between align-items-center' data-id='" . $amigo['id'] . "'>";
+            echo "<div>";
             echo $amigo['username'];
             echo " <span id='unread-" . $amigo['id'] . "' class='badge badge-primary'>";
             if ($amigo['mensajes_sin_leer'] > 0) {
                 echo $amigo['mensajes_sin_leer'];
             }
             echo "</span>";
+            echo "</div>";
+            echo "<div class='dropdown'>";
+            echo "<button class='btn btn-secondary btn-sm dropdown-toggle' type='button' id='dropdownMenuButton-" . $amigo['id'] . "' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>";
+            echo "</button>";
+            echo "<div class='dropdown-menu' aria-labelledby='dropdownMenuButton-" . $amigo['id'] . "'>";
+            echo "<a class='dropdown-item' href='../actions/delete_friend.php?id=" . $amigo['id'] . "'>Borrar amigo</a>";
+            echo "</div>";
+            echo "</div>";
             echo "</div>";
         }
         ?>
