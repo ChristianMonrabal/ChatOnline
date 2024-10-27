@@ -9,18 +9,15 @@ CREATE TABLE Usuarios (
     password VARCHAR(255) NOT NULL
 );
 
-SELECT * FROM Usuarios;
-
 CREATE TABLE Amistades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     amigo_id INT NOT NULL,
     estado ENUM('pendiente', 'aceptada', 'rechazada') DEFAULT 'pendiente',
+    fecha_actualizacion DATETIME,
     FOREIGN KEY (usuario_id) REFERENCES Usuarios(id),
     FOREIGN KEY (amigo_id) REFERENCES Usuarios(id)
 );
-
-SELECT * FROM Amistades;
 
 CREATE TABLE Mensajes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,8 +25,11 @@ CREATE TABLE Mensajes (
     receptor_id INT NOT NULL,
     mensaje TEXT NOT NULL,
     fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
+    leido TINYINT(1) DEFAULT 0,
     FOREIGN KEY (emisor_id) REFERENCES Usuarios(id),
     FOREIGN KEY (receptor_id) REFERENCES Usuarios(id)
 );
 
+SELECT * FROM Usuarios;
+SELECT * FROM Amistades;
 SELECT * FROM Mensajes;
