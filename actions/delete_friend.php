@@ -15,7 +15,15 @@ $query_delete = "DELETE FROM Amistades
                 OR (usuario_id = $amigo_id AND amigo_id = $usuario_id)";
 
 if (mysqli_query($conn, $query_delete)) {
-    $_SESSION['mensaje'] = "Amigo eliminado con éxito.";
+    $query_delete_messages = "DELETE FROM Mensajes 
+                            WHERE (emisor_id = $usuario_id AND receptor_id = $amigo_id) 
+                            OR (emisor_id = $amigo_id AND receptor_id = $usuario_id)";
+
+    if (mysqli_query($conn, $query_delete_messages)) {
+        $_SESSION['mensaje'] = "Amigo y mensajes eliminados con éxito.";
+    } else {
+        $_SESSION['error_mensaje'] = "Error al eliminar los mensajes.";
+    }
 } else {
     $_SESSION['error_mensaje'] = "Error al eliminar al amigo.";
 }
