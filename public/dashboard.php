@@ -82,7 +82,7 @@ $usuario = mysqli_fetch_assoc($result_usuario);
         while ($amigo = mysqli_fetch_assoc($result)) {
             echo "<div class='friend p-2 d-flex justify-content-between align-items-center' data-id='" . $amigo['id'] . "'>";
             echo "<div>";
-            echo htmlspecialchars($amigo['username']); // cambiar esto
+            echo htmlspecialchars($amigo['username']);
             echo " <span id='unread-" . $amigo['id'] . "' class='badge badge-primary'>";
             if ($amigo['mensajes_sin_leer'] > 0) {
                 echo $amigo['mensajes_sin_leer'];

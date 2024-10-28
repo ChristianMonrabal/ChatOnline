@@ -9,7 +9,6 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 $amigo_id = $_GET['amigo_id'];
 
-// se ha cambiado
 $query = "SELECT m.*, u.username AS emisor_nombre 
         FROM Mensajes m 
         JOIN Usuarios u ON m.emisor_id = u.id 
@@ -25,7 +24,7 @@ mysqli_query($conn, $update_query);
 while ($mensaje = mysqli_fetch_assoc($result)) {
     $class = $mensaje['emisor_id'] == $usuario_id ? "user" : "friend";
     echo "<div class='message $class'>";
-    echo "<strong>" . htmlspecialchars($mensaje['emisor_nombre']) . ":</strong> ";
+    echo "<strong>" . htmlspecialchars($mensaje['emisor_nombre']) . ":</strong><br>";
     echo htmlspecialchars($mensaje['mensaje']);
     echo "</div>";
 }
