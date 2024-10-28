@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $receptor_id = $_POST['receptor_id'];
     $mensaje = mysqli_real_escape_string($conn, trim($_POST['mensaje']));
 
-    if (strlen($mensaje) <= 250) {
+    if (!empty($mensaje) && strlen($mensaje) <= 250) {
         $query = "INSERT INTO Mensajes (emisor_id, receptor_id, mensaje, fecha_envio, leido) 
                     VALUES ('$emisor_id', '$receptor_id', '$mensaje', NOW(), 0)";
         if (mysqli_query($conn, $query)) {
@@ -16,6 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             echo "Error al enviar el mensaje.";
         }
+    } elseif (strlen($mensaje) > 250) {
+        echo "El mensaje es demasiado largo, el máximo son 250 caracteres.";
+    } else {
+        echo "El mensaje no puede estar vacío.";
     }
 }
 ?>

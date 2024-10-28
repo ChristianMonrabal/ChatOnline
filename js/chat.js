@@ -22,6 +22,27 @@ $(document).ready(function() {
         });
     }
 
+    function formatMessage(mensaje) {
+        const words = mensaje.split(' ');
+        let formattedMessage = '';
+        let line = '';
+
+        words.forEach(word => {
+            if (line.length + word.length + 1 <= 40) {  // +1 para el espacio
+                line += (line.length ? ' ' : '') + word;
+            } else {
+                formattedMessage += line + '\n';  // Añade la línea y un salto de línea
+                line = word;  // Empieza una nueva línea con la palabra actual
+            }
+        });
+
+        if (line.length > 0) {
+            formattedMessage += line;  // Añade la última línea si existe
+        }
+
+        return formattedMessage;
+    }
+
     $('.friend').on('click', function() {
         var amigo_id = $(this).data('id');
         $('#chat-header').text('Chat con ' + $(this).text());
@@ -39,10 +60,18 @@ $(document).ready(function() {
 
         $('#chat-form').off('submit').on('submit', function(e) {
             e.preventDefault();
+            
+            // Obtener el mensaje y formatearlo
+            let mensaje = $('textarea[name="mensaje"]').val();
+            let mensajeFormateado = formatMessage(mensaje);  // Llama a la función de formateo
+
             $.ajax({
                 type: 'POST',
                 url: '../actions/chat_action.php',
-                data: $(this).serialize() + '&receptor_id=' + amigo_id,
+                data: {
+                    mensaje: mensajeFormateado,
+                    receptor_id: amigo_id
+                },
                 success: function(response) {
                     $('#chat-box').append(response);
                     $('textarea[name="mensaje"]').val('');

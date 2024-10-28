@@ -112,7 +112,7 @@ $usuario = mysqli_fetch_assoc($result_usuario);
         <div id="chat-box">
         </div>
         <form id="chat-form">
-            <textarea name="mensaje" maxlength="250" required class="form-control" placeholder="Escribe tu mensaje..."></textarea>
+        <textarea name="mensaje" maxlength="250" class="form-control" placeholder="Escribe tu mensaje..."></textarea>
             <button type="submit" class="btn btn-success mt-2">Enviar</button>
         </form>
     </div>

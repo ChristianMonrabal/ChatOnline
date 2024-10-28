@@ -98,6 +98,8 @@ body {
     flex: 1;
     padding: 10px;
     background: url(../img/background_chat.png);
+    white-space: pre-line;  /* Permite que los saltos de línea se respeten */
+    direction: ltr; /* Cambia la dirección del contenido a izquierda a derecha */
 }
 
 #chat-form {

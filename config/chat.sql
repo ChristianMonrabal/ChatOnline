@@ -23,7 +23,7 @@ CREATE TABLE Mensajes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     emisor_id INT NOT NULL,
     receptor_id INT NOT NULL,
-    mensaje TEXT NOT NULL,
+    mensaje VARCHAR(250) NOT NULL,
     fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
     leido TINYINT(1) DEFAULT 0,
     FOREIGN KEY (emisor_id) REFERENCES Usuarios(id),
