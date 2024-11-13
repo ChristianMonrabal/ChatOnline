@@ -1,14 +1,20 @@
 <?php
+// Inicia la sesión para almacenar y recuperar datos de sesión
 session_start();
 
+// Incluye el archivo de configuración para la conexión a la base de datos
 include '../config/db.php';
 
+// Comprueba si la solicitud es de tipo POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Asigna y valida cada campo del formulario, aplicando saneamiento para prevenir inyecciones de código
     $username = isset($_POST['username']) ? htmlspecialchars(trim($_POST['username'])) : '';
     $nombre_real = isset($_POST['nombre_real']) ? htmlspecialchars(trim($_POST['nombre_real'])) : '';
     $email = isset($_POST['email']) ? htmlspecialchars(trim($_POST['email'])) : '';
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+    $confirm_password = isset($_POST['confirm_password']) ? trim($_POST['confirm_password']) : '';
 
+    // Validación del nombre de usuario
     if (empty($username)) {
         $_SESSION['error'] = "El nombre de usuario es obligatorio.";
         $_SESSION['section'] = 'signup';
@@ -20,8 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: ../public/login.php?section=signup");
         exit();
     }
-    $_SESSION['signup_username'] = $username;
+    $_SESSION['signup_username'] = $username; // Guarda el nombre de usuario en la sesión para reutilizar en caso de error
 
+    // Validación del nombre real
     if (empty($nombre_real)) {
         $_SESSION['error'] = "El nombre es obligatorio.";
         $_SESSION['section'] = 'signup';
@@ -30,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $_SESSION['nombre_real'] = $nombre_real;
 
+    // Validación del correo electrónico
     if (empty($email)) {
         $_SESSION['error'] = "El correo electrónico es obligatorio.";
         $_SESSION['section'] = 'signup';
@@ -43,6 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $_SESSION['signup_email'] = $email;
 
+    // Validación de la contraseña
     if (empty($password)) {
         $_SESSION['error'] = "La contraseña es obligatoria.";
         $_SESSION['section'] = 'signup';
@@ -65,8 +74,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Validación de la confirmación de la contraseña
+    if ($password !== $confirm_password) {
+        $_SESSION['error'] = "Las contraseñas no coinciden.";
+        $_SESSION['section'] = 'signup';
+        header("Location: ../public/login.php?section=signup");
+        exit();
+    }
+
+    // Encripta la contraseña para almacenarla de forma segura
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
+    // Verificación de unicidad del nombre de usuario
     $sql_username_check = "SELECT id FROM Usuarios WHERE username = ?";
     $stmt_username = mysqli_prepare($conn, $sql_username_check);
     mysqli_stmt_bind_param($stmt_username, "s", $username);
@@ -81,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     mysqli_stmt_close($stmt_username);
 
+    // Verificación de unicidad del correo electrónico
     $sql_email_check = "SELECT id FROM Usuarios WHERE email = ?";
     $stmt_email = mysqli_prepare($conn, $sql_email_check);
     mysqli_stmt_bind_param($stmt_email, "s", $email);
@@ -95,10 +115,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     mysqli_stmt_close($stmt_email);
 
+    // Inserta el nuevo usuario en la base de datos
     $sql = "INSERT INTO Usuarios (username, nombre_real, email, password) VALUES (?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "ssss", $username, $nombre_real, $email, $hashed_password);
 
+    // Verifica si la inserción fue exitosa y redirige
     if (mysqli_stmt_execute($stmt)) {
         $usuario_id = mysqli_insert_id($conn);
         $_SESSION['loggedin'] = true;
@@ -107,6 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: ../index.php");
         exit();
     } else {
+        // Si hay un error en la inserción, lo guarda en la sesión y redirige
         $_SESSION['error'] = "Error: " . mysqli_error($conn);
         $_SESSION['section'] = 'signup';
         header("Location: ../public/login.php?section=signup");
@@ -115,5 +138,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_stmt_close($stmt);
 }
 
+// Cierra la conexión a la base de datos
 mysqli_close($conn);
 ?>
