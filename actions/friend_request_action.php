@@ -13,54 +13,84 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $usuario_id = $_SESSION['usuario_id'];
         $amigo_id = $_POST['amigo_id'];
 
-        // Consulta para comprobar si ya existe una amistad aceptada entre los dos usuarios
-        $check_friends_query = "SELECT * FROM Amistades 
-                                WHERE ((usuario_id = '$usuario_id' AND amigo_id = '$amigo_id') 
-                                OR (usuario_id = '$amigo_id' AND amigo_id = '$usuario_id')) 
-                                AND estado = 'aceptada'";
-        $check_friends_result = mysqli_query($conn, $check_friends_query);
+        // Inicia una transacción
+        mysqli_begin_transaction($conn);
 
-        // Si ya son amigos, muestra un mensaje de error y redirige al dashboard
-        if (mysqli_num_rows($check_friends_result) > 0) {
-            $_SESSION['error_mensaje'] = "Este usuario ya es tu amigo.";
-            header("Location: ../public/dashboard.php");
-            exit();
-        }
+        try {
+            // Consulta para comprobar si ya existe una amistad aceptada entre los dos usuarios
+            $check_friends_query = "SELECT * FROM Amistades 
+                                    WHERE ((usuario_id = ? AND amigo_id = ?) 
+                                    OR (usuario_id = ? AND amigo_id = ?)) 
+                                    AND estado = 'aceptada'";
+            $stmt = mysqli_prepare($conn, $check_friends_query);
+            mysqli_stmt_bind_param($stmt, 'iiii', $usuario_id, $amigo_id, $amigo_id, $usuario_id);
+            mysqli_stmt_execute($stmt);
+            $check_friends_result = mysqli_stmt_get_result($stmt);
 
-        // Consulta para comprobar si ya existe una solicitud de amistad pendiente
-        $check_query = "SELECT * FROM Amistades WHERE usuario_id = '$usuario_id' AND amigo_id = '$amigo_id' AND estado = 'pendiente'";
-        $check_result = mysqli_query($conn, $check_query);
-
-        // Si no existe una solicitud pendiente
-        if (mysqli_num_rows($check_result) == 0) {
-            // Consulta para comprobar si la última solicitud fue rechazada en las últimas 24 horas
-            $check_rejected_query = "SELECT * FROM Amistades 
-                                    WHERE usuario_id = '$usuario_id' 
-                                    AND amigo_id = '$amigo_id' 
-                                    AND estado = 'rechazada' 
-                                    AND fecha_actualizacion > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
-            $check_rejected_result = mysqli_query($conn, $check_rejected_query);
-
-            // Si no hubo una solicitud rechazada en las últimas 24 horas
-            if (mysqli_num_rows($check_rejected_result) == 0) {
-                // Inserta una nueva solicitud de amistad en estado "pendiente"
-                $query = "INSERT INTO Amistades (usuario_id, amigo_id, estado, fecha_actualizacion) 
-                            VALUES ('$usuario_id', '$amigo_id', 'pendiente', NOW())";
-                if (mysqli_query($conn, $query)) {
-                    // Redirige al dashboard si la solicitud se envió con éxito
-                    header("Location: ../public/dashboard.php");
-                } else {
-                    echo "Error al enviar la solicitud de amistad.";
-                }
-            } else {
-                // Si se rechazó recientemente, muestra un mensaje de error
-                $_SESSION['error_mensaje'] = "No puedes enviar una solicitud de amistad a este usuario hasta que pasen 24 horas desde la última solicitud rechazada.";
+            // Si ya son amigos, muestra un mensaje de error y redirige al dashboard
+            if (mysqli_num_rows($check_friends_result) > 0) {
+                $_SESSION['error_mensaje'] = "Este usuario ya es tu amigo.";
+                mysqli_rollback($conn);
                 header("Location: ../public/dashboard.php");
                 exit();
             }
-        } else {
-            // Si ya existe una solicitud pendiente, muestra un mensaje de error
-            $_SESSION['error_mensaje'] = "Ya existe una solicitud de amistad pendiente.";
+
+            // Consulta para comprobar si ya existe una solicitud de amistad pendiente
+            $check_query = "SELECT * FROM Amistades WHERE usuario_id = ? AND amigo_id = ? AND estado = 'pendiente'";
+            $stmt = mysqli_prepare($conn, $check_query);
+            mysqli_stmt_bind_param($stmt, 'ii', $usuario_id, $amigo_id);
+            mysqli_stmt_execute($stmt);
+            $check_result = mysqli_stmt_get_result($stmt);
+
+            // Si no existe una solicitud pendiente
+            if (mysqli_num_rows($check_result) == 0) {
+                // Consulta para comprobar si la última solicitud fue rechazada en las últimas 24 horas
+                $check_rejected_query = "SELECT * FROM Amistades 
+                                        WHERE usuario_id = ? 
+                                        AND amigo_id = ? 
+                                        AND estado = 'rechazada' 
+                                        AND fecha_actualizacion > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+                $stmt = mysqli_prepare($conn, $check_rejected_query);
+                mysqli_stmt_bind_param($stmt, 'ii', $usuario_id, $amigo_id);
+                mysqli_stmt_execute($stmt);
+                $check_rejected_result = mysqli_stmt_get_result($stmt);
+
+                // Si no hubo una solicitud rechazada en las últimas 24 horas
+                if (mysqli_num_rows($check_rejected_result) == 0) {
+                    // Inserta una nueva solicitud de amistad en estado "pendiente"
+                    $insert_query = "INSERT INTO Amistades (usuario_id, amigo_id, estado, fecha_actualizacion) 
+                                    VALUES (?, ?, 'pendiente', NOW())";
+                    $stmt = mysqli_prepare($conn, $insert_query);
+                    mysqli_stmt_bind_param($stmt, 'ii', $usuario_id, $amigo_id);
+
+                    if (!mysqli_stmt_execute($stmt)) {
+                        throw new Exception("Error al enviar la solicitud de amistad.");
+                    }
+
+                    // Confirma la transacción
+                    mysqli_commit($conn);
+                    // Redirige al dashboard si la solicitud se envió con éxito
+                    header("Location: ../public/dashboard.php");
+                    exit();
+                } else {
+                    // Si se rechazó recientemente, muestra un mensaje de error
+                    $_SESSION['error_mensaje'] = "No puedes enviar una solicitud de amistad a este usuario hasta que pasen 24 horas desde la última solicitud rechazada.";
+                    mysqli_rollback($conn);
+                    header("Location: ../public/dashboard.php");
+                    exit();
+                }
+            } else {
+                // Si ya existe una solicitud pendiente, muestra un mensaje de error
+                $_SESSION['error_mensaje'] = "Ya existe una solicitud de amistad pendiente.";
+                mysqli_rollback($conn);
+                header("Location: ../public/dashboard.php");
+                exit();
+            }
+
+        } catch (Exception $e) {
+            // Si ocurre un error, revierte la transacción
+            mysqli_rollback($conn);
+            $_SESSION['error_mensaje'] = $e->getMessage();
             header("Location: ../public/dashboard.php");
             exit();
         }
@@ -71,11 +101,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $solicitud_id = $_POST['solicitud_id'];
         $accion = $_POST['accion'];
 
-        // Actualiza el estado de la solicitud con la acción proporcionada
-        $query = "UPDATE Amistades SET estado = '$accion', fecha_actualizacion = NOW() WHERE id = '$solicitud_id'";
-        if (mysqli_query($conn, $query)) {
+        // Prepara la consulta para actualizar el estado de la solicitud
+        $update_query = "UPDATE Amistades SET estado = ?, fecha_actualizacion = NOW() WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $update_query);
+        mysqli_stmt_bind_param($stmt, 'si', $accion, $solicitud_id);
+
+        if (mysqli_stmt_execute($stmt)) {
             // Redirige al dashboard si se actualizó la solicitud con éxito
             header("Location: ../public/dashboard.php");
+            exit();
         } else {
             echo "Error al gestionar la solicitud de amistad.";
         }

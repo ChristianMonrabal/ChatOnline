@@ -85,57 +85,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Encripta la contraseña para almacenarla de forma segura
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    // Verificación de unicidad del nombre de usuario
-    $sql_username_check = "SELECT id FROM Usuarios WHERE username = ?";
-    $stmt_username = mysqli_prepare($conn, $sql_username_check);
-    mysqli_stmt_bind_param($stmt_username, "s", $username);
-    mysqli_stmt_execute($stmt_username);
-    mysqli_stmt_store_result($stmt_username);
+    // Inicia una transacción
+    mysqli_begin_transaction($conn, MYSQLI_TRANS_START_READ_WRITE);
 
-    if (mysqli_stmt_num_rows($stmt_username) > 0) {
-        $_SESSION['error'] = "El nombre de usuario ya existe.";
-        $_SESSION['section'] = 'signup';
-        header("Location: ../public/login.php?section=signup");
-        exit();
-    }
-    mysqli_stmt_close($stmt_username);
+    try {
+        // Verificación de unicidad del nombre de usuario
+        $sql_username_check = "SELECT id FROM Usuarios WHERE username = ?";
+        $stmt_username = mysqli_prepare($conn, $sql_username_check);
+        mysqli_stmt_bind_param($stmt_username, "s", $username);
+        mysqli_stmt_execute($stmt_username);
+        mysqli_stmt_store_result($stmt_username);
 
-    // Verificación de unicidad del correo electrónico
-    $sql_email_check = "SELECT id FROM Usuarios WHERE email = ?";
-    $stmt_email = mysqli_prepare($conn, $sql_email_check);
-    mysqli_stmt_bind_param($stmt_email, "s", $email);
-    mysqli_stmt_execute($stmt_email);
-    mysqli_stmt_store_result($stmt_email);
+        if (mysqli_stmt_num_rows($stmt_username) > 0) {
+            throw new Exception("El nombre de usuario ya existe.");
+        }
+        mysqli_stmt_close($stmt_username);
 
-    if (mysqli_stmt_num_rows($stmt_email) > 0) {
-        $_SESSION['error'] = "El correo electrónico ya existe.";
-        $_SESSION['section'] = 'signup';
-        header("Location: ../public/login.php?section=signup");
-        exit();
-    }
-    mysqli_stmt_close($stmt_email);
+        // Verificación de unicidad del correo electrónico
+        $sql_email_check = "SELECT id FROM Usuarios WHERE email = ?";
+        $stmt_email = mysqli_prepare($conn, $sql_email_check);
+        mysqli_stmt_bind_param($stmt_email, "s", $email);
+        mysqli_stmt_execute($stmt_email);
+        mysqli_stmt_store_result($stmt_email);
 
-    // Inserta el nuevo usuario en la base de datos
-    $sql = "INSERT INTO Usuarios (username, nombre_real, email, password) VALUES (?, ?, ?, ?)";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "ssss", $username, $nombre_real, $email, $hashed_password);
+        if (mysqli_stmt_num_rows($stmt_email) > 0) {
+            throw new Exception("El correo electrónico ya existe.");
+        }
+        mysqli_stmt_close($stmt_email);
 
-    // Verifica si la inserción fue exitosa y redirige
-    if (mysqli_stmt_execute($stmt)) {
+        // Inserta el nuevo usuario en la base de datos
+        $sql = "INSERT INTO Usuarios (username, nombre_real, email, password) VALUES (?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssss", $username, $nombre_real, $email, $hashed_password);
+
+        // Ejecuta la inserción
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception("Error al registrar el usuario: " . mysqli_error($conn));
+        }
+
+        // Confirma la transacción
+        mysqli_commit($conn);
+
+        // Redirige al usuario después de un registro exitoso
         $usuario_id = mysqli_insert_id($conn);
         $_SESSION['loggedin'] = true;
         $_SESSION['usuario_id'] = $usuario_id;
         $_SESSION['username'] = $username;
         header("Location: ../index.php");
         exit();
-    } else {
-        // Si hay un error en la inserción, lo guarda en la sesión y redirige
-        $_SESSION['error'] = "Error: " . mysqli_error($conn);
+    } catch (Exception $e) {
+        // Revierte la transacción en caso de error
+        mysqli_rollback($conn);
+
+        // Almacena el error en la sesión y redirige
+        $_SESSION['error'] = $e->getMessage();
         $_SESSION['section'] = 'signup';
         header("Location: ../public/login.php?section=signup");
         exit();
+    } finally {
+        if (isset($stmt)) {
+            mysqli_stmt_close($stmt);
+        }
     }
-    mysqli_stmt_close($stmt);
 }
 
 // Cierra la conexión a la base de datos
